@@ -5,6 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from assistant import chat_with_assistant
 load_dotenv()
 
+from openai import OpenAI
+client = OpenAI()
 
 app = FastAPI()
 
@@ -23,5 +25,14 @@ async def read_root():
 
 @app.get("/get_information")
 async def get_information(message: str, new: bool, id_thread: Optional[str] = None):
-    response = chat_with_assistant(message, new, id_thread)
+    if new:
+        thread = client.beta.threads.create()
+        id = thread.id
+    elif new==False: 
+        thread = client.beta.threads.retrieve(id_thread)  
+        id = thread.id
+    else:
+        return {"error": "id_thread must be provided when new is False"}
+
+    response = chat_with_assistant(message, thread, id)
     return response
