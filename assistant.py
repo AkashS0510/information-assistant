@@ -196,16 +196,9 @@ def handle_run_response(thread_id, run):
     else:
         print(f"Unhandled run status: {run.status}")
 
-def chat_with_assistant(prompt, new, id_thread=None):
-    if new == True:
-        # Create a new thread
-        thread = client.beta.threads.create()
-        id = thread.id
-    else:
-        # Use the provided thread ID
-        id = id_thread
-        thread = None  # Initialize thread as None for the else case
+def chat_with_assistant(prompt,thread,id_thread=None):
 
+    id = id_thread
     messagerun = handle_message(prompt, thread_id=id)
     print("hello")
     if messagerun.status == 'requires_action':
@@ -214,9 +207,11 @@ def chat_with_assistant(prompt, new, id_thread=None):
         # Retrieve runInfo only if a thread object exists
         if thread:
             runInfo = client.beta.threads.runs.retrieve(thread_id=thread.id, run_id=messagerun.id)
+            print(runInfo)
             if runInfo.completed_at is None:
                 client.beta.threads.runs.cancel(messagerun.id, thread_id=id)
         print("hi")
+        thread = None
         messagerun_output = handle_message(
             '''Use the tool output and try to answer the prompt as a sentence. If the information is not available, tell it. Do not mention about the tools. 
             Imagine you are presnting the information to a user as a markdown. Mentions about the sources and url of any information at thge last of the sentance. 
