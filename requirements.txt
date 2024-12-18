@@ -6,4 +6,4 @@ duckduckgo-search
 enum34==1.1.10
 python-dotenv==1.0.1
 uvicorn==0.25.0
-openai==1.43.0
+openai
